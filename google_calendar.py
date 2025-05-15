@@ -6,20 +6,17 @@ from googleapiclient.discovery import build
 
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
-
 def get_calendar_service():
     creds_data = os.getenv("GOOGLE_CREDENTIALS")
     token_data = os.getenv("GOOGLE_TOKEN")
 
     if not creds_data or not token_data:
-        raise Exception("Не найдены переменные окружения GOOGLE_CREDENTIALS или GOOGLE_TOKEN")
+        raise Exception("Переменные окружения GOOGLE_CREDENTIALS или GOOGLE_TOKEN не заданы")
 
     creds_json = json.loads(token_data)
     creds = Credentials.from_authorized_user_info(creds_json, SCOPES)
-    return build("calendar", "v3", credentials=creds)
-
-
-
+    service = build("calendar", "v3", credentials=creds)
+    return service
 
 def add_event(summary: str, start_time: datetime.datetime, duration_minutes=60):
     service = get_calendar_service()
