@@ -29,7 +29,7 @@ async def handle_addevent(chat_id: int, text: str):
         await send_message(chat_id, "Не смог понять дату. Пример: /addevent Встреча завтра в 15:00")
         return
 
-    summary = text.split("в")[0].replace("/addevent", "").strip().capitalize()
+    summary = text.replace("/addevent", "").rsplit("в", 1)[0].strip()
     link = add_event(summary, time)
     formatted_time = time.strftime('%H:%M %d.%m')
     await send_message(chat_id, f"Событие добавлено: {summary} в {formatted_time}\n{link}")
