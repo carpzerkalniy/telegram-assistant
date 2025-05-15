@@ -8,7 +8,7 @@ import os
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
 
-# Упрощённый парсер даты
+# Упрощённый парсер даты и времени
 def parse_datetime(text):
     now = datetime.datetime.now()
     match = re.search(r"(сегодня|завтра)?\s*в\s*(\d{1,2})(?::(\d{2}))?", text, re.IGNORECASE)
@@ -45,7 +45,8 @@ async def handle_calendar(chat_id: int):
     for e in events:
         start = e["start"].get("dateTime", e["start"].get("date"))
         summary = e.get("summary", "Без названия")
-        msg += f"- {start[:16].replace('T', ' ')} — {summary}\n"
+        msg += f"- {start[:16].replace('T', ' ')} — {summary}
+"
     await send_message(chat_id, msg)
 
 async def send_message(chat_id: int, text: str):
