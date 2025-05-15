@@ -31,8 +31,8 @@ async def handle_addevent(chat_id: int, text: str):
 
     summary = text.split("в")[0].replace("/addevent", "").strip().capitalize()
     link = add_event(summary, time)
-    await send_message(chat_id, f"Событие добавлено: {summary} в {time.strftime('%H:%M %d.%m')}
-{link}")
+    formatted_time = time.strftime('%H:%M %d.%m')
+    await send_message(chat_id, f"Событие добавлено: {summary} в {formatted_time}\n{link}")
 
 async def handle_calendar(chat_id: int):
     events = get_upcoming_events()
@@ -40,13 +40,12 @@ async def handle_calendar(chat_id: int):
         await send_message(chat_id, "Ближайших событий не найдено.")
         return
 
-    msg = "🗓 Ближайшие события:
-"
+    msg = "🗓 Ближайшие события:\n"
     for e in events:
         start = e["start"].get("dateTime", e["start"].get("date"))
         summary = e.get("summary", "Без названия")
-        msg += f"- {start[:16].replace('T', ' ')} — {summary}
-"
+        formatted_start = start[:16].replace("T", " ")
+        msg += f"- {formatted_start} — {summary}\n"
     await send_message(chat_id, msg)
 
 async def send_message(chat_id: int, text: str):
