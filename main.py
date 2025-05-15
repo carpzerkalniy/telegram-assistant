@@ -39,7 +39,7 @@ async def webhook(req: Request):
 
 async def send_message(chat_id: int, text: str):
     async with httpx.AsyncClient() as client:
-        await client.post(f"{API_URL}/sendMessage", json={{
+        await client.post(f"{API_URL}/sendMessage", json={
             "chat_id": chat_id,
             "text": text
-        }})
+        })
