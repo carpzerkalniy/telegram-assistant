@@ -1,24 +1,37 @@
 from fastapi import FastAPI, Request
-import os
 import httpx
+import os
+import re
+from telegram_calendar_handlers import handle_addevent, handle_calendar
 
 app = FastAPI()
 
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-API_URL = f"https://api.telegram.org/bot7259946019:AAHQ61Dwp_GuXuvAPaoXF_6ea8NQNSZW2EA"
-
+API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
 
 @app.post("/webhook")
 async def webhook(req: Request):
     data = await req.json()
     if "message" in data:
-        chat_id = data["message"]["chat"]["id"]
-        text = data["message"].get("text", "")
+        message = data["message"]
+        chat_id = message["chat"]["id"]
+        text = message.get("text", "")
 
-        async with httpx.AsyncClient() as client:
-            await client.post(f"{API_URL}/sendMessage", json={
-                "chat_id": chat_id,
-                "text": f"Ты сказал: {text}"
-            })
+        # Обработка календарных команд
+        if text.startswith("/addevent"):
+            await handle_addevent(chat_id, text)
+        elif text.startswith("/calendar"):
+            await handle_calendar(chat_id)
+        elif re.search(r"(завтра|сегодня).*в\s*\d{1,2}", text.lower()):
+            await handle_addevent(chat_id, f"/addevent {text}")
+        else:
+            await send_message(chat_id, f"Ты сказал: {text}")
 
     return {"ok": True}
+
+async def send_message(chat_id: int, text: str):
+    async with httpx.AsyncClient() as client:
+        await client.post(f"{API_URL}/sendMessage", json={{
+            "chat_id": chat_id,
+            "text": text
+        }})
