@@ -8,7 +8,7 @@ import os
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
 
-# Упрощённый парсер для "завтра в 14:00"
+# Упрощённый парсер даты
 def parse_datetime(text):
     now = datetime.datetime.now()
     match = re.search(r"(сегодня|завтра)?\s*в\s*(\d{1,2})(?::(\d{2}))?", text, re.IGNORECASE)
@@ -26,14 +26,13 @@ def parse_datetime(text):
 async def handle_addevent(chat_id: int, text: str):
     time = parse_datetime(text)
     if not time:
-        await send_message(chat_id, "Не смог понять дату. Попробуй: /addevent Встреча завтра в 15:00")
+        await send_message(chat_id, "Не смог понять дату. Пример: /addevent Встреча завтра в 15:00")
         return
 
-    # Вырезаем название события (всё до даты)
     summary = text.split("в")[0].replace("/addevent", "").strip().capitalize()
     link = add_event(summary, time)
-    await send_message(chat_id, f"Событие добавлено: {summary} в {time.strftime('%H:%M %d.%m')}\n{link}")
-
+    await send_message(chat_id, f"Событие добавлено: {summary} в {time.strftime('%H:%M %d.%m')}
+{link}")
 
 async def handle_calendar(chat_id: int):
     events = get_upcoming_events()
@@ -51,7 +50,7 @@ async def handle_calendar(chat_id: int):
 
 async def send_message(chat_id: int, text: str):
     async with httpx.AsyncClient() as client:
-        await client.post(f"{API_URL}/sendMessage", json={
+        await client.post(f"{API_URL}/sendMessage", json={{
             "chat_id": chat_id,
             "text": text
-        })
+        }})
